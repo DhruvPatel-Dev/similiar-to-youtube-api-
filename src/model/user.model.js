@@ -14,7 +14,7 @@ const userSchema = new Schema({
         index:true,
     },
     email:{
-        type:true,
+        type:String,
         required:true,
         unique:true,
         lowercase:true,
@@ -62,7 +62,8 @@ userSchema.pre("save",function (){
     if(!this.isModified("password")) return next();
 
     this.password=bcrypt.hash(this.password,10);
-    next()
+      
+     
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){

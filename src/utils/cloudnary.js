@@ -17,7 +17,8 @@ import { v2 as cloudinary } from 'cloudinary';
             const cloudnaryResponse = await cloudinary.uploader.upload(localFilePath,{
                 resource_type:"auto"
             })
-
+              
+            fs.unlinkSync(localFilePath);
             return cloudnaryResponse
             
         } catch (error) {
