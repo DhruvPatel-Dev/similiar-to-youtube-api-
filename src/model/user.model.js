@@ -19,6 +19,7 @@ const userSchema = new Schema({
         unique:true,
         lowercase:true,
         trim:true,
+        index:true
         
     },
     fullname:{
@@ -58,14 +59,17 @@ const userSchema = new Schema({
 
 
 
-userSchema.pre("save",function (){
+userSchema.pre("save",async function (next){
     if(!this.isModified("password")) return next();
 
-    this.password=bcrypt.hash(this.password,10);
-      
+    try {
+        this.password= await bcrypt.hash(this.password,10);
+      next()
+    } catch (error) {
+        next(error)
+    }
      
 })
-
 userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password,this.password)
 }
@@ -90,7 +94,7 @@ userSchema.methods.genrateRefreshToken = function (){
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIn:REFRESH_TOKEN_EXPIRY
+            expiresIn:process.env.REFRESH_TOKEN_EXPIRY
         }
 
     )

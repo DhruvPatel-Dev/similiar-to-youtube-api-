@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { v2 as cloudinary } from 'cloudinary';
+import ApiError from "./apiError.js";
 
     // Configuration
     cloudinary.config({ 
@@ -17,16 +18,14 @@ import { v2 as cloudinary } from 'cloudinary';
             const cloudnaryResponse = await cloudinary.uploader.upload(localFilePath,{
                 resource_type:"auto"
             })
-              
-            fs.unlinkSync(localFilePath);
-            return cloudnaryResponse
+             
+            fs.unlinkSync(localFilePath)
+            return cloudnaryResponse;
             
         } catch (error) {
 
             fs.unlinkSync(localFilePath);
-
-            return null;
-            
+            throw new ApiError(500,"error while uploafing")
         }
     }
 
