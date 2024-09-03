@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { v2 as cloudinary } from 'cloudinary';
 import ApiError from "./apiError.js";
+import { response } from "express";
 
     // Configuration
     cloudinary.config({ 
@@ -28,6 +29,24 @@ import ApiError from "./apiError.js";
             throw new ApiError(500,"error while uploafing")
         }
     }
+    const deleteOnCloudnary = async (cloudnaryPath) =>{
+
+        try {
+            if(!cloudnaryPath) return null;
+         
+           await cloudinary.uploader.destroy(cloudnaryPath, function(error, result) {
+                if (error) {
+                  throw new ApiError(400,error.message)
+                } else {
+                 return result
+                }
+              });
+          
+        } catch (error) {
+
+           throw new ApiError(error.statusCode,error.message)
+        }
+    }
 
 
-    export {uploadOnCloudnary}
+    export {uploadOnCloudnary,deleteOnCloudnary}

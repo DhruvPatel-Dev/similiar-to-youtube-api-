@@ -24,14 +24,14 @@ router.post('/register',upload.fields([{
 }]),
 registerUser)
 router.post('/login',loginUser);
-router.post('/refresh-token',refreshAccessToken);
+router.patch('/refresh-token',refreshAccessToken);
 
 router.use(verifyJWT)
 router.post('/logout',logOutUser);
-router.post('/changepassword',changePassword)
-router.post('/updateuserdetails',updateUserDetails)
-router.post('/updateuseravatar',upload.single('avatar'),updateUserAvater)
-router.post('/updateusercoverimage',upload.single('coverimage'),updateCoverImage)
+router.patch('/changepassword',changePassword)
+router.patch('/updateuserdetails',updateUserDetails)
+router.patch('/updateuseravatar',upload.single('avatar'),updateUserAvater)
+router.patch('/updateusercoverimage',upload.single('coverimage'),updateCoverImage)
 
 
 

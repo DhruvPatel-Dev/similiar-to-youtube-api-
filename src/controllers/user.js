@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js"
 import {user} from "../model/user.model.js"
-import { uploadOnCloudnary } from "../utils/cloudnary.js";
+import { deleteOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import JWT from "jsonwebtoken"
 
@@ -215,20 +215,25 @@ const updateUserDetails = asyncHandler (async (req,res)=>{
 const updateUserAvater = asyncHandler(async(req,res)=>{
   
   const avatarLocalPath = req.file?.path;
-
+  
   if(!avatarLocalPath) throw new ApiError(400,"please upload avatar");
   
     try {
 
       
     const avatarUpload =  await uploadOnCloudnary(avatarLocalPath)
+    const oldAvtarUrl = req.user.avatar.slice(61,81)
+
+    
+    
     await user.findByIdAndUpdate(req.user._id,{$set:{
          avatar:avatarUpload.url
        }},{
         new:true
       })
-
- res.status(200).json(new ApiResponse(201,"avtar updated succesfully"));
+       
+   await deleteOnCloudnary(oldAvtarUrl)
+   res.status(200).json(new ApiResponse(201,"avtar updated succesfully"));
 
       
     } catch (error) {
