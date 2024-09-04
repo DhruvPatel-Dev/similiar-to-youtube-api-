@@ -265,14 +265,140 @@ const updateCoverImage = asyncHandler ( async (req,res) =>{
     }
 })
 
+const getUserChannelProfile = asyncHandler( async (req,res) =>{
+
+  const channel = req.params.channel;
+
+  try {
+      
+
+    const channeldata = await user.aggregate([
+      {
+            $match:{
+              username:channel.toLowerCase()
+            }
+      },
+      {
+        $lookup:{
+          from:"subscription",
+          localField:"_id",
+          foreignField:"channel",
+          as:"subscribers",
+          
+        }
+      },
+      {
+        $lookup:{
+          from:'subscription',
+          localField:"_id",
+          foreignField:"subscriber",
+          as:"subscribedTo"
+        } 
+      },
+      {
+        $addFields:{
+          subscriber:{$size:"$subscribers"},
+          subscribedTo:{$size:"$subscribedTo"},
+          isSubscribed:{$cond:{
+            if:{$in:[req.user?._id,'$subscribers.subscriber']},
+            then:true,
+            else:false,
+          }}
+        }
+      },
+      {
+        $project:{
+          username:1,
+          email:1,
+          subscriber:1,
+          subscribedTo:1,
+          avatar:1,
+          coverimage:1,
+          isSubscribed:1,
+        }
+      }
+    ])
+    if(!channeldata?.length) throw new ApiError(400,"not a valid channel name")
+    res.json(new ApiResponse(200,channeldata,"channel data"))
+
+  } catch (error) {
+
+     throw new ApiError(error.statusCode,error.message)
+    
+  }
+    
+     
+
+    
+
+})
+
+const userWatchHistory = asyncHandler ( async (req,res) =>{
+ 
+  
+ 
+  try {
+
+    const watchHistory = await user.aggregate([
+      {
+        $match:{
+          username:req.user.username,
+        }
+      },
+      {
+        $lookup:{
+          from:"video",
+          localField:"watchhistory",
+          foreignField:"_id",
+          as:"watchhistory",
+          pipeline:[
+            {
+              $lookup:{
+                from:"user",
+                localField:"owner",
+                foreignField:"_id",
+                as:"ownername",
+                pipeline:[{
+                  $project:{
+                    username:1
+                  }
+                }]
+              }
+            },
+            {
+              $addFields:{
+                owner:{
+                  $first:"$ownername"
+                }
+              }
+            }
+          ]
+      
+        },
+      },
+  
+    ])
+
+    res.status(200).json(new ApiResponse(200,watchHistory[0].watchhistory,"watch"))
+    
+  } catch (error) {
+
+    throw new ApiError(500,"server error")
+    
+  }
+
+})
 
 
-
-
-
-
-
-
-
-
-export {registerUser,loginUser,logOutUser,refreshAccessToken,changePassword,updateUserDetails,updateUserAvater,updateCoverImage}
+export {
+  registerUser,
+  loginUser,
+  logOutUser,
+  refreshAccessToken,
+  changePassword,
+  updateUserDetails,
+  updateUserAvater,
+  updateCoverImage,
+  getUserChannelProfile,
+  userWatchHistory
+}
