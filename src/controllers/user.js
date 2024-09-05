@@ -5,16 +5,17 @@ import { deleteOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import JWT from "jsonwebtoken"
 
-const genrateAccessAndRefreshToken = async (userId) =>{
 
-    const cuser = await user.findById(userId);
-    const accessToken = await cuser.genrateAccessToken();
-    const refreshToken = await cuser.genrateRefreshToken();
+const genrateAccessAndRefreshToken = asyncHandler( async (userId) =>{
 
-    cuser.refreshtoken = refreshToken;
-    await cuser.save({validateBeforeSave:false});
-    return {accessToken,refreshToken }
-}
+  const cuser = await user.findById(userId);
+  const accessToken = await cuser.genrateAccessToken();
+  const refreshToken = await cuser.genrateRefreshToken();
+
+  cuser.refreshtoken = refreshToken;
+  await cuser.save({validateBeforeSave:false});
+  return {accessToken,refreshToken }
+})
 
 const registerUser = asyncHandler( async (req,res)=>{
     
@@ -42,14 +43,14 @@ const registerUser = asyncHandler( async (req,res)=>{
             {
                 throw new ApiError(400,"avatar and coverimage required");
             } 
-            
+          
         const avtarUpload = await uploadOnCloudnary(avatarLocalpath)
         const coverImageUpload = await uploadOnCloudnary(coverimageLocalpath);
-      
-       let cuser
+        
+           
        try {
         
-       cuser =  await user.create({
+      const cuser =  await user.create({
         username,
         email,
         password,
@@ -57,19 +58,19 @@ const registerUser = asyncHandler( async (req,res)=>{
         avatar:avtarUpload.url,
         coverimage:coverImageUpload.url
        });
+
+       
+     res.json(new ApiResponse(201,cuser.username,"user created succesfully"))
+
        } catch (error) {
-         throw new ApiError(500,"error while creating user")
+        
+        throw new ApiError(500,"error while creating user")
        }
 
-        const createduser = await user.findById(cuser._id).select("-password -refreshtoken");
+        
 
-        if(!createduser)
-        {
-            throw new ApiError(500,"something went wrong while createing user");
-
-        }
-           
-       return res.status(201).json( new ApiResponse(201,createduser,"user registerd successfuly"));
+       
+       
        
 
 })

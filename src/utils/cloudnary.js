@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs, { unlink } from "node:fs";
 import { v2 as cloudinary } from 'cloudinary';
 import ApiError from "./apiError.js";
 import { response } from "express";
@@ -19,8 +19,6 @@ import { response } from "express";
             const cloudnaryResponse = await cloudinary.uploader.upload(localFilePath,{
                 resource_type:"auto"
             })
-             
-            fs.unlinkSync(localFilePath)
             return cloudnaryResponse;
             
         } catch (error) {
@@ -28,6 +26,7 @@ import { response } from "express";
             fs.unlinkSync(localFilePath);
             throw new ApiError(500,"error while uploafing")
         }
+
     }
     const deleteOnCloudnary = async (cloudnaryPath) =>{
 
