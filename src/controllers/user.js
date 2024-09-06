@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js"
 import {user} from "../model/user.model.js"
-import { deleteOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
+import { deleteOnCloudnary, delteimageOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import JWT from "jsonwebtoken"
 
@@ -9,12 +9,11 @@ import JWT from "jsonwebtoken"
 const genrateAccessAndRefreshToken = asyncHandler( async (userId) =>{
 
   const cuser = await user.findById(userId);
-  const accessToken = await cuser.genrateAccessToken();
-  const refreshToken = await cuser.genrateRefreshToken();
-
+  const accessToken =  cuser.genrateAccessToken();
+  const refreshToken = cuser.genrateRefreshToken();
   cuser.refreshtoken = refreshToken;
   await cuser.save({validateBeforeSave:false});
-  return {accessToken,refreshToken }
+  return {accessToken,refreshToken}
 })
 
 const registerUser = asyncHandler( async (req,res)=>{
@@ -90,9 +89,10 @@ const loginUser = asyncHandler(async(req,res)=>{
 
        if(!result) throw new ApiError(400,"invalid password")
         
-      const {accessToken,refreshToken} = await genrateAccessAndRefreshToken(cuser._id);
-      cuser.password = undefined;
-      cuser.refreshtoken = undefined;
+      const accessToken= await cuser.genrateAccessToken();
+      const refreshToken= await cuser.genrateRefreshToken();
+      
+   
 
       const options = {
         httpOnly:true,
@@ -104,9 +104,7 @@ const loginUser = asyncHandler(async(req,res)=>{
       .cookie("accesstoken",accessToken,options)
       .cookie("refreshtoken",refreshToken,options)
       .json(
-        new ApiResponse(200,{
-            user:cuser,accessToken,refreshToken
-        },
+        new ApiResponse(200,cuser,
         "user loggeed in success")
       )
 
@@ -233,7 +231,7 @@ const updateUserAvater = asyncHandler(async(req,res)=>{
         new:true
       })
        
-   await deleteOnCloudnary(oldAvtarUrl)
+    await delteimageOnCloudnary(oldAvtarUrl)
    res.status(200).json(new ApiResponse(201,"avtar updated succesfully"));
 
       

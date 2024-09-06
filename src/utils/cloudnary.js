@@ -28,24 +28,33 @@ import { response } from "express";
         }
 
     }
-    const deleteOnCloudnary = async (cloudnaryPath) =>{
+    const deleteOnCloudnary = async (...cloudnaryPath) =>{
+
+      try {
+        cloudinary.api
+        .delete_resources(cloudnaryPath, 
+          { type: 'upload', resource_type: 'video' })
+        
+      } catch (error) {
+        throw new ApiError(error.statusCode,error.message)
+        
+      }
+       
+    }
+    const delteimageOnCloudnary  = async (...cloudnaryPath) =>{
 
         try {
-            if(!cloudnaryPath) return null;
-         
-           await cloudinary.uploader.destroy(cloudnaryPath, function(error, result) {
-                if (error) {
-                  throw new ApiError(400,error.message)
-                } else {
-                 return result
-                }
-              });
+            cloudinary.api
+            .delete_resources(cloudnaryPath, 
+              { type: 'upload',resource_type:'image'})
+            .then(console.log);
           
         } catch (error) {
-
-           throw new ApiError(error.statusCode,error.message)
+          throw new ApiError(error.statusCode,error.message)
+          
         }
-    }
+         
+      }
 
 
-    export {uploadOnCloudnary,deleteOnCloudnary}
+    export {uploadOnCloudnary,deleteOnCloudnary,delteimageOnCloudnary}
