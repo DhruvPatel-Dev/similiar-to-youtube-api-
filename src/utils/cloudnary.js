@@ -47,7 +47,7 @@ import { response } from "express";
             cloudinary.api
             .delete_resources(cloudnaryPath, 
               { type: 'upload',resource_type:'image'})
-            .then(console.log);
+
           
         } catch (error) {
           throw new ApiError(error.statusCode,error.message)

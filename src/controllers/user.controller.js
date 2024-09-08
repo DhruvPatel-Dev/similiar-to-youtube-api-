@@ -1,20 +1,27 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js"
 import {user} from "../model/user.model.js"
-import { deleteOnCloudnary, delteimageOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
+import {delteimageOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import JWT from "jsonwebtoken"
 
 
-const genrateAccessAndRefreshToken = asyncHandler( async (userId) =>{
+const generateAccessAndRefereshTokens = async(userId) =>{
+  try {
+      const cuser = await user.findById(userId)
+      const accessToken = cuser.genrateAccessToken()
+      const refreshToken = cuser.genrateRefreshToken()
 
-  const cuser = await user.findById(userId);
-  const accessToken =  cuser.genrateAccessToken();
-  const refreshToken = cuser.genrateRefreshToken();
-  cuser.refreshtoken = refreshToken;
-  await cuser.save({validateBeforeSave:false});
-  return {accessToken,refreshToken}
-})
+      cuser.refreshtoken = refreshToken
+      await cuser.save({ validateBeforeSave: false })
+
+      return {accessToken, refreshToken}
+
+
+  } catch (error) {
+      throw new ApiError(500, "Something went wrong while generating referesh and access token")
+  }
+}
 
 const registerUser = asyncHandler( async (req,res)=>{
     
@@ -89,11 +96,8 @@ const loginUser = asyncHandler(async(req,res)=>{
 
        if(!result) throw new ApiError(400,"invalid password")
         
-      const accessToken= await cuser.genrateAccessToken();
-      const refreshToken= await cuser.genrateRefreshToken();
-      
-   
-
+        const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(cuser._id)
+ 
       const options = {
         httpOnly:true,
         secure:true,
@@ -158,7 +162,7 @@ const refreshAccessToken = asyncHandler (async(req,res)=>{
       httpOnly:true,
       secure:true
     }  
-    const {accessToken,refreshToken} = await genrateAccessAndRefreshToken(cuser._id);
+    const {accessToken,refreshToken} = await generateAccessAndRefereshTokens(cuser._id);
     res.status(200).
     cookie("accesstoken",accessToken,options).
     cookie("refreshtoken",refreshToken,options).
@@ -248,14 +252,15 @@ const updateCoverImage = asyncHandler ( async (req,res) =>{
   
     try {
 
-      
     const coverUpload =  await uploadOnCloudnary(coverImageLocalPath)
     await user.findByIdAndUpdate(req.user._id,{$set:{
         coverimage:coverUpload.url
        }},{
         new:true
       })
-
+      const coverImageCloudPath = user.coverimage.slice(61).split('.')
+      await delteimageOnCloudnary(coverImageCloudPath[0])
+   
  res.status(200).json(new ApiResponse(201,"cover image updated succesfully"));
 
       

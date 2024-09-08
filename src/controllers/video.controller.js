@@ -130,6 +130,7 @@ try {
     await deleteOnCloudnary(cloudpath[0])
     
     await video.findByIdAndUpdate(req.params.videoId,{videofile:videoCloudnary.url},{new:true})
+    res.status(201).json(new ApiResponse(201,cvideo.videofile,"video Updated Succesfully"))
 } catch (error) {
  throw new ApiError(error.statusCode,error.message)
    
