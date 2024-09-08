@@ -9,7 +9,7 @@ import {        registerUser,
                 updateCoverImage,
                 getUserChannelProfile,
                 userWatchHistory
-    } from "../controllers/user.js";
+    } from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.js";
 import { verifyJWT } from "../middleware/auth.js";
 
