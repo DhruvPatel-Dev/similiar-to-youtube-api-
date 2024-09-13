@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js"
-import {user} from "../model/user.model.js"
+import {users as user} from "../model/user.model.js"
 import {delteimageOnCloudnary, uploadOnCloudnary } from "../utils/cloudnary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import JWT from "jsonwebtoken"
@@ -253,12 +253,13 @@ const updateCoverImage = asyncHandler ( async (req,res) =>{
     try {
 
     const coverUpload =  await uploadOnCloudnary(coverImageLocalPath)
+    const coverImageCloudPath = req.user.coverimage.slice(61).split('.')
     await user.findByIdAndUpdate(req.user._id,{$set:{
         coverimage:coverUpload.url
        }},{
         new:true
       })
-      const coverImageCloudPath = user.coverimage.slice(61).split('.')
+      
       await delteimageOnCloudnary(coverImageCloudPath[0])
    
  res.status(200).json(new ApiResponse(201,"cover image updated succesfully"));
@@ -284,7 +285,7 @@ const getUserChannelProfile = asyncHandler( async (req,res) =>{
       },
       {
         $lookup:{
-          from:"subscription",
+          from:"subscriptions",
           localField:"_id",
           foreignField:"channel",
           as:"subscribers",
@@ -293,7 +294,7 @@ const getUserChannelProfile = asyncHandler( async (req,res) =>{
       },
       {
         $lookup:{
-          from:'subscription',
+          from:'subscriptions',
           localField:"_id",
           foreignField:"subscriber",
           as:"subscribedTo"
@@ -346,19 +347,19 @@ const userWatchHistory = asyncHandler ( async (req,res) =>{
     const watchHistory = await user.aggregate([
       {
         $match:{
-          username:req.user.username,
+          _id:req.user._id,
         }
       },
       {
         $lookup:{
-          from:"video",
+          from:"videos",
           localField:"watchhistory",
           foreignField:"_id",
           as:"watchhistory",
           pipeline:[
             {
               $lookup:{
-                from:"user",
+                from:"users",
                 localField:"owner",
                 foreignField:"_id",
                 as:"ownername",

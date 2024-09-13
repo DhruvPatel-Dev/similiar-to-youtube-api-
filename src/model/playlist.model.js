@@ -14,11 +14,11 @@ const playlistSchema = new Schema({
     },
     owner:{
         type:Schema.Types.ObjectId,
-        ref:"user"
+        ref:"users"
     },
     videos:[{
         type:Schema.Types.ObjectId,
-        ref:"video"
+        ref:"videos"
     }]
 
 },
@@ -27,4 +27,4 @@ const playlistSchema = new Schema({
 })
 
 
-export const playlist = mongoose.model("playlist",playlistSchema)
+export const playlists = mongoose.model("playlists",playlistSchema)

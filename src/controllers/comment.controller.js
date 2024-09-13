@@ -1,4 +1,4 @@
-import { commentModel as comment } from "../model/comments.model.js";
+import { commentModels as comment } from "../model/comments.model.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";

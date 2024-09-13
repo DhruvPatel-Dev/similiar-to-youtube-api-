@@ -33,7 +33,7 @@ const videoSchema = new Schema({
     },
     owner:{
         type:Schema.Types.ObjectId,
-        ref:"user"
+        ref:"users"
     }
 
 },
@@ -41,6 +41,4 @@ const videoSchema = new Schema({
     timestamps:true,
 })
 
-const video = mongoose.model("video",videoSchema)
-
-export default video
+export const videos = mongoose.model("videos",videoSchema)

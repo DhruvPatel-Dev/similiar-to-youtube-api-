@@ -3,15 +3,15 @@ import mongoose,{Schema} from "mongoose";
 const likeSchema = new Schema({
     likedBy:{
         type:Schema.Types.ObjectId,
-        ref:"user"
+        ref:"users"
     },
     video:{
         type:Schema.Types.ObjectId,
-        ref:"video"
+        ref:"videos"
     },
     comment: {
         type:Schema.Types.ObjectId,
-        ref:"comment"
+        ref:"comments"
 
     }
 },{
@@ -20,4 +20,4 @@ const likeSchema = new Schema({
 
 
 
-export const likeModel = mongoose.model("like",likeSchema)
+export const likeModels = mongoose.model("likes",likeSchema)

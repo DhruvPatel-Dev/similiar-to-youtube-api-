@@ -9,11 +9,11 @@ const commentSchema = new Schema({
     },
     owner:{
         type:Schema.Types.ObjectId,
-        ref:"user"
+        ref:"users"
     },
     video:{
         type:Schema.Types.ObjectId,
-        ref:"video"
+        ref:"videos"
     },
 
 },
@@ -22,4 +22,4 @@ const commentSchema = new Schema({
 })
 
 
-export const commentModel = mongoose.model("comment",commentSchema)
+export const commentModels = mongoose.model("comments",commentSchema)

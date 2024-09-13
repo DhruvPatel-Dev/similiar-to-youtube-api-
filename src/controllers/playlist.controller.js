@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { playlist } from "../model/playlist.model.js";
+import { playlists as playlist } from "../model/playlist.model.js";
 import ApiError from '../utils/apiError.js'
 import ApiResponse from '../utils/ApiResponse.js'
 
@@ -77,7 +77,7 @@ const updatePlaylist = asyncHandler (async(req,res)=>{
 const addVideoToPlaylist = asyncHandler(async(req,res)=>{
        
     try {
-      const ad = await playlist.updateOne({_id:req.params.playlistId},{$push:{videos:req.params.videoId}})
+     await playlist.updateOne({_id:req.params.playlistId},{$push:{videos:req.params.videoId}})
         res.status(200).json(new ApiResponse(200,"video Added Successfully"))
     } catch (error) {
         throw new ApiError(error.statusCode,error.message)

@@ -1,4 +1,5 @@
-import video from "../model/video.model.js"
+import { users as user } from "../model/user.model.js";
+import {videos as video} from "../model/video.model.js"
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import {asyncHandler }from "../utils/asyncHandler.js"
@@ -86,8 +87,9 @@ const publishVideo = asyncHandler(async (req,res)=>{
 const getVideoById  = asyncHandler(async(req,res)=>{
  
    try {
-      const cvideo = await video.findById(req.params.videoId)
+      const cvideo = await video.findByIdAndUpdate(req.params.videoId,{$inc:{views:1}})
       if(!cvideo) throw new ApiError(400,"not a valid video id")
+     await user.updateOne({_id:req.user._id},{$push:{watchhistory:cvideo._id}}) 
       res.status(200).json(new ApiResponse(201,cvideo,"video Fetched Successfully"))
       
    } catch (error) {

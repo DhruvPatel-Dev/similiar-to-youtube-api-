@@ -39,8 +39,8 @@ const userSchema = new Schema({
     },
     watchhistory:[
         {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"video"
+            type:Schema.Types.ObjectId,
+            ref:"videos"
         }
     ],
     password:{
@@ -102,4 +102,4 @@ userSchema.methods.genrateRefreshToken = function (){
 
 
 
-export const user = mongoose.model("user",userSchema)
+export const users = mongoose.model("users",userSchema)
