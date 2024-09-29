@@ -10,6 +10,6 @@ then(()=>{
         console.log(`server is running at ${process.env.PORT}`)
     })
 }).
-catch((Error)=>{
+catch((error)=>{
     console.log("db Connection failed")
 })
